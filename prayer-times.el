@@ -1,4 +1,4 @@
-;;; (buffer-name)"prayer-times.el"
+;;; prayer-times.el --- Islamic prayer times application
 
 ;; Copyright (C) 2013 Cory Koch
 
@@ -24,17 +24,60 @@
 ;; along with prayer-times.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
+;; Prayer times currently will get the prayer times for your location
+;; for the current date. The goal is to make it behave similar to calendar
+;; and also be integrated into calendar. Currently only the current date
+;; is displayed but I would like to have it also show the monthly prayer times.
+;; As far as integration with calendar goes, I would like to make it so that
+;; when you select a date an the calendar that you can hit say p and have it 
+;; bring up the prayer times for that date, similiar to how you can press a 
+;; key combo and have the Islamic date that corresponds to that date displayed
+
+;; Sample of output:
+;; date ("September 29, 2013")
+;; fajr ("6:15")
+;; sunrise ("7:29")
+;; dhuhr ("1:25")
+;; asr ("4:44")
+;; maghrib ("7:20")
+;; isha ("8:36")
+
+;;; Setup:
+;; See the customization for prayer-times
+;; All customizations should be straight forward, the only ones that may be a problem are:
+;; longitude, latitude and timezone. To get these I would just go to the islamicfinder.org 
+;; site and get the prayer times for the week, get the url and search for the needed values.
+;; A sample url is included below See: URL Samples.
+;; I hope eventually make this easier by utilizing the customizations from solar.el (part of calendar)
+
+
+;;; Usage:
+;; M-x prayer-times
 
 ;; URL Samples:
 ;; http://www.islamicfinder.org/prayerService.php?country=usa&city=toledo&state=OH&zipcode=43607&latitude=41.6484&longitude=-83.6037&timezone=-5.0&HanfiShafi=1&pmethod=5&fajrTwilight1=&fajrTwilight2=&ishaTwilight=0&ishaInterval=0&dhuhrInterval=1&maghribInterval=1&dayLight=1&page_background=&table_background=&table_lines=&text_color=&link_color=&prayerFajr=&prayerSunrise=&prayerDhuhr=&prayerAsr=&prayerMaghrib=&prayerIsha=&lang=&lookChange=1
 
 ;; http://www.islamicfinder.org/prayer_service.php?country=usa&city=cambridge&state=MA&zipcode=&latitude=42.3802&longitude=-71.1347&timezone=-5.0&HanfiShafi=1&pmethod=5&fajrTwilight1=&fajrTwilight2=&ishaTwilight=0&ishaInterval=0&dhuhrInterval=1&maghribInterval=1&dayLight=1&simpleFormat=xml
 
+;;; TODOs
+;; TODO use the custom vars from Calendars Lunar calender/ Solar Calender settings
+;; TODO refactor retrieval method
+;; TODO refactor display method to allow interchanging of functions (to support different sites)
+;; TODO -- OR should we have the data "normalized" to the current xml format?
+;; TODO make the layout/display similar to Calendar mode
+;; TODO use a calculation method for the prayer times
+;; TODO integrate this into calendar, add ability to select a date and get the prayer time for 
+;; the selected date respectively
+;; TODO display this in a tabledate ("September 26, 2013")
+;; fajr ("6:11")
+;; sunrise ("7:26")
+;; dhuhr ("1:26")
+;; asr ("4:47")
+;; maghrib ("7:25")
+;; isha ("8:41")
 
 ;;; Code: 
 ;; Vars
-;; TODO use the custom vars from Calendars Lunar calender/ Solar Calender settings
-
 (defconst prayer-times-buffer "*Prayer-Times*"
   "Name of the buffer used for the prayer times.")
 
@@ -74,18 +117,9 @@
 (defcustom prayer-times-prayer-time-xml "~/.prayer-times"
   "Location of prayer times cache")
 
-;; TODO refactor retrieval method
-;; TODO refactor display method to allow interchanging of functions (to support different sites)
-;; TODO -- OR should we have the data "normalized" to the current xml format?
-;; TODO make the layout/display similar to Calendar mode
-;; TODO use a calculation method for the prayer times
-;; TODO integrate this into calendar, add ability to select a date and get the prayer time for 
-;; the selected date respectively
 (defun get-prayer-times ()
-    (shell-command
-     (format (concat "wget -O " prayer-times-prayer-time-xml " '%s'") prayer-times-url)))
-
-(get-prayer-times)
+  (shell-command
+   (format (concat "wget -O " prayer-times-prayer-time-xml " '%s'") prayer-times-url)))
 
 (defun read-prayer-times (file)
 "Reads the prayer times xml into memory"
@@ -94,6 +128,8 @@
     (libxml-parse-xml-region (point-min) (point-max))))
 
 (defmacro format-prayer-times (prayer-time)
+  "format the prayer times so that they displayed as the name of the prayer on the left
+and the time of the prayer on the right."
   `(insert "\n" (pp-to-string (first ,prayer-time)) " " (pp-to-string (last ,prayer-time))))
 
 (defun format-prayer-times (prayer-time)
@@ -108,18 +144,11 @@
       (format-prayer-times
        (get-prayer-time prayer prayer-time-xml)))))
 
-;; TODO display this in a tabledate ("September 26, 2013")
-;; fajr ("6:11")
-;; sunrise ("7:26")
-;; dhuhr ("1:26")
-;; asr ("4:47")
-;; maghrib ("7:25")
-;; isha ("8:41")
-
 ;;;###autoload
 (defun prayer-times ()
   ""
   (interactive)
+  (get-prayer-times)
   (prayer-times-basic-setup))
 
 (defun prayer-times-basic-setup ()
@@ -161,9 +190,7 @@ For a complete description, see the info node `Prayer-times'."
         buffer-undo-list t
         indent-tabs-mode nil)
   (set (make-local-variable 'scroll-margin) 0))
-  
 
-
-
+;;; prayer-times.el ends here
 
 
