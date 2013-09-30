@@ -43,6 +43,10 @@ Islamic prayer times in Emacs
 
 
 * Usage:
+  Once a day perform:
+  M-x prayer-time-get-prayer-times 
+  To update the prayer times cache. I will eventually automate this.
+  To list the prayer times for the day do:
   M-x prayer-times
 
  URL Samples:

@@ -57,6 +57,10 @@
 
 
 ;;; Usage:
+;; Once a day perform:
+;; M-x prayer-time-get-prayer-times 
+;; To update the prayer times cache. I will eventually automate this.
+;; To list the prayer times for the day do:
 ;; M-x prayer-times
 
 ;; URL Samples:
@@ -122,7 +126,10 @@
 (defcustom prayer-times-prayer-time-xml "~/.prayer-times"
   "Location of prayer times cache")
 
-(defun get-prayer-times ()
+;;;###autoload
+(defun prayer-times-get-prayer-times ()
+  "Download the prayer times to the cache"
+  (interactive)
   (shell-command
    (format (concat "wget -O " prayer-times-prayer-time-xml " '%s'") prayer-times-url)))
 
@@ -152,7 +159,6 @@ and the time of the prayer on the right."
 ;;;###autoload
 (defun prayer-times ()
   (interactive)
-  (get-prayer-times)
   (prayer-times-basic-setup))
 
 (defun prayer-times-basic-setup ()
