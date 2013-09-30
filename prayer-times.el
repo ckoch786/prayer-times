@@ -30,7 +30,7 @@
 ;; is displayed but I would like to have it also show the monthly prayer times.
 ;; As far as integration with calendar goes, I would like to make it so that
 ;; when you select a date an the calendar that you can hit say p and have it 
-;; bring up the prayer times for that date, similiar to how you can press a 
+;; bring up the prayer times for that date, similar to how you can press a 
 ;; key combo and have the Islamic date that corresponds to that date displayed
 
 ;; Sample of output:
@@ -44,11 +44,11 @@
 
 ;;; Setup:
 ;; See the customization for prayer-times
-;; All customizations should be straight forward, the only ones that may be a problem are:
+;; All customization should be straight forward, the only ones that may be a problem are:
 ;; longitude, latitude and timezone. To get these I would just go to the islamicfinder.org 
-;; site and get the prayer times for the week, get the url and search for the needed values.
-;; A sample url is included below See: URL Samples.
-;; I hope eventually make this easier by utilizing the customizations from solar.el (part of calendar)
+;; site and get the prayer times for the week, get the URL and search for the needed values.
+;; A sample URL is included below See: URL Samples.
+;; I hope eventually make this easier by utilizing the customization from solar.el (part of calendar)
 
 
 ;;; Usage:
@@ -63,7 +63,7 @@
 ;; TODO use the custom vars from Calendars Lunar calender/ Solar Calender settings
 ;; TODO refactor retrieval method
 ;; TODO refactor display method to allow interchanging of functions (to support different sites)
-;; TODO -- OR should we have the data "normalized" to the current xml format?
+;; TODO -- OR should we have the data "normalized" to the current XML format?
 ;; TODO make the layout/display similar to Calendar mode
 ;; TODO use a calculation method for the prayer times
 ;; TODO integrate this into calendar, add ability to select a date and get the prayer time for 
@@ -146,13 +146,11 @@ and the time of the prayer on the right."
 
 ;;;###autoload
 (defun prayer-times ()
-  ""
   (interactive)
   (get-prayer-times)
   (prayer-times-basic-setup))
 
 (defun prayer-times-basic-setup ()
-  ""
   (let ((buff (current-buffer)))
     (set-buffer (get-buffer-create prayer-times-buffer))
     (display-prayer-times)
@@ -171,7 +169,6 @@ and the time of the prayer on the right."
   (prayer-times-generate-window))
 
 (defun prayer-times-generate-window ()
-  ""
   (let ((in-prayer-time-window (eq (window-buffer (selected-window))
 				   (get-buffer prayer-times-buffer))))
   (when in-prayer-time-window
