@@ -42,6 +42,11 @@
 ;; maghrib ("7:20")
 ;; isha ("8:36")
 
+;;; Installation:
+;; Add the following to your init.el
+;; (load "~/.emacs.d/prayer-times/prayer-times.el")
+;; Then reload your init.el with M-x load-buffer
+
 ;;; Setup:
 ;; See the customization for prayer-times
 ;; All customization should be straight forward, the only ones that may be a problem are:

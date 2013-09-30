@@ -22,6 +22,12 @@ Islamic prayer times in Emacs
  maghrib ("7:20")
  isha ("8:36")
 
+* Installation:
+ Add the following to your init.el
+ (load "~/.emacs.d/prayer-times/prayer-times.el")
+ Then reload your init.el with M-x load-buffer
+
+
 * Setup:
  See the customization for prayer-times
  All customization should be straight forward, the only ones that may be a problem are:
@@ -40,15 +46,15 @@ Islamic prayer times in Emacs
  http://www.islamicfinder.org/prayer_service.php?country=usa&city=cambridge&state=MA&zipcode=&latitude=42.3802&longitude=-71.1347&timezone=-5.0&HanfiShafi=1&pmethod=5&fajrTwilight1=&fajrTwilight2=&ishaTwilight=0&ishaInterval=0&dhuhrInterval=1&maghribInterval=1&dayLight=1&simpleFormat=xml
 
 * TODOs
- TODO use the custom vars from Calendars Lunar calender/ Solar Calender settings
- TODO refactor retrieval method
- TODO refactor display method to allow interchanging of functions (to support different sites)
- TODO -- OR should we have the data "normalized" to the current XML format?
- TODO make the layout/display similar to Calendar mode
- TODO use a calculation method for the prayer times
- TODO integrate this into calendar, add ability to select a date and get the prayer time for 
- the selected date respectively
- TODO display this in a tabledate ("September 26, 2013")
+- [ ] TODO use the custom vars from Calendars Lunar calender/ Solar Calender settings
+- [ ] TODO refactor retrieval method
+- [ ] TODO refactor display method to allow interchanging of functions (to support different sites)
+- [ ] TODO -- OR should we have the data "normalized" to the current XML format?
+- [ ] TODO make the layout/display similar to Calendar mode
+- [ ] TODO use a calculation method for the prayer times
+- [ ] TODO integrate this into calendar, add ability to select a date and get the prayer time for 
+- [ ] the selected date respectively
+- [ ] TODO display this in a tabledate ("September 26, 2013")
  fajr ("6:11")
  sunrise ("7:26")
  dhuhr ("1:26")
