@@ -13,7 +13,10 @@ Islamic prayer times in Emacs
  bring up the prayer times for that date, similar to how you can press a 
  key combo and have the Islamic date that corresponds to that date displayed
 
+<br>
+<pre>
  Sample of output:
+
  date ("September 29, 2013")
  fajr ("6:15")
  sunrise ("7:29")
@@ -21,11 +24,13 @@ Islamic prayer times in Emacs
  asr ("4:44")
  maghrib ("7:20")
  isha ("8:36")
+</pre>
 
 * Installation:
  Add the following to your init.el
- (load "~/.emacs.d/prayer-times/prayer-times.el")
- Then reload your init.el with M-x load-buffer
+     (load "~/.emacs.d/prayer-times/prayer-times.el")
+ Then reload your init.el with 
+ M-x load-buffer
 
 
 * Setup:
@@ -33,12 +38,12 @@ Islamic prayer times in Emacs
  All customization should be straight forward, the only ones that may be a problem are:
  longitude, latitude and timezone. To get these I would just go to the islamicfinder.org 
  site and get the prayer times for the week, get the URL and search for the needed values.
- A sample URL is included below See: URL Samples.
+ A sample URL is included below See: URL Samples.<br>
  I hope eventually make this easier by utilizing the customization from solar.el (part of calendar)
 
 
 * Usage:
- M-x prayer-times
+  M-x prayer-times
 
  URL Samples:
  http://www.islamicfinder.org/prayerService.php?country=usa&city=toledo&state=OH&zipcode=43607&latitude=41.6484&longitude=-83.6037&timezone=-5.0&HanfiShafi=1&pmethod=5&fajrTwilight1=&fajrTwilight2=&ishaTwilight=0&ishaInterval=0&dhuhrInterval=1&maghribInterval=1&dayLight=1&page_background=&table_background=&table_lines=&text_color=&link_color=&prayerFajr=&prayerSunrise=&prayerDhuhr=&prayerAsr=&prayerMaghrib=&prayerIsha=&lang=&lookChange=1
@@ -54,10 +59,11 @@ Islamic prayer times in Emacs
 - [ ] TODO use a calculation method for the prayer times
 - [ ] TODO integrate this into calendar, add ability to select a date and get the prayer time for 
 - [ ] the selected date respectively
-- [ ] TODO display this in a tabledate ("September 26, 2013")
+- [ ] TODO display this in a tabledate 
+<pre>("September 26, 2013")
  fajr ("6:11")
  sunrise ("7:26")
  dhuhr ("1:26")
  asr ("4:47")
  maghrib ("7:25")
- isha ("8:41")
+ isha ("8:41")</pre>
