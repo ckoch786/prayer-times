@@ -63,21 +63,16 @@
 ;; To list the prayer times for the day do:
 ;; M-x prayer-times
 
-;; URL Samples:
-;; http://www.islamicfinder.org/prayerService.php?country=usa&city=toledo&state=OH&zipcode=43607&latitude=41.6484&longitude=-83.6037&timezone=-5.0&HanfiShafi=1&pmethod=5&fajrTwilight1=&fajrTwilight2=&ishaTwilight=0&ishaInterval=0&dhuhrInterval=1&maghribInterval=1&dayLight=1&page_background=&table_background=&table_lines=&text_color=&link_color=&prayerFajr=&prayerSunrise=&prayerDhuhr=&prayerAsr=&prayerMaghrib=&prayerIsha=&lang=&lookChange=1
-
-;; http://www.islamicfinder.org/prayer_service.php?country=usa&city=cambridge&state=MA&zipcode=&latitude=42.3802&longitude=-71.1347&timezone=-5.0&HanfiShafi=1&pmethod=5&fajrTwilight1=&fajrTwilight2=&ishaTwilight=0&ishaInterval=0&dhuhrInterval=1&maghribInterval=1&dayLight=1&simpleFormat=xml
-
 ;;; TODOs
 ;; TODO use the custom vars from Calendars Lunar calender/ Solar Calender settings
 ;; TODO refactor retrieval method
 ;; TODO refactor display method to allow interchanging of functions (to support different sites)
-;; TODO -- OR should we have the data "normalized" to the current XML format?
+;; TODO -- OR should we have the data "normalized" to the current JSON format?
 ;; TODO make the layout/display similar to Calendar mode
 ;; TODO use a calculation method for the prayer times
 ;; TODO integrate this into calendar, add ability to select a date and get the prayer time for 
 ;; the selected date respectively
-;; TODO display this in a tabledate ("September 26, 2013")
+;; TODO display this in a table date ("September 26, 2013")
 ;; fajr ("6:11")
 ;; sunrise ("7:26")
 ;; dhuhr ("1:26")
@@ -90,40 +85,33 @@
 (defconst prayer-times-buffer "*Prayer-Times*"
   "Name of the buffer used for the prayer times.")
 
-(defcustom prayer-times-country "usa"
-  "Country")
+;; 16 degree ISNA, 1 is 18 degree time University of Islamic Science, Karachi
+(defcustom prayer-times-method "2" 
+  "Method of calculation")
 
-(defcustom prayer-times-city "toledo"
-  "City")
+;; Shafi, 2 is Hanafi
+(defcustom prayer-times-school "1" 
+  "School (madhab)")
 
-(defcustom prayer-times-state "OH"
-  "State abbriviation")
-
-(defcustom prayer-times-zip "43607"
-  "Five digit zip code")
-
-(defcustom prayer-times-latitude "41.6484"
+(defcustom prayer-times-latitude "40.0168996"
   "latitude")
 
-(defcustom prayer-times-longitude "-83.6037"
+(defcustom prayer-times-longitude "-83.1480781"
   "longitude")
 
-(defcustom prayer-times-timezone "-5.0"
-  "timezone")
+(defcustom prayer-times-api-key "9i165kupa4LdtFOTnCtBe9v76JzEN86lDhG0HOkQG7E3ak50"
+  "API key")
 
-(defcustom prayer-times-url (concat "http://www.islamicfinder.org/prayer_service.php?country=" prayer-times-country
-			 "&city=" prayer-times-city
-			 "&state=" prayer-times-state
-			 "&zipcode=" prayer-times-zip
-			 "&latitude=" prayer-times-latitude
-			 "&longitude=" prayer-times-longitude
-			 "&timezone=" prayer-times-timezone
-			 "&HanfiShafi=1&pmethod=5"
-			 "&fajrTwilight1=&fajrTwilight2=&ishaTwilight=0&ishaInterval=0"
-			 "&dhuhrInterval=1&maghribInterval=1&dayLight=1&simpleFormat=xml")
+(defcustom prayer-times-url (concat "https://islamicapi.com/api/v1/prayer-time/?"
+				    "lat=" prayer-times-latitude
+				    "&lon=" prayer-times-longitude
+				    "&method=" prayer-times-method
+				    "&school=" prayer-times-school
+				    "&api_key=" prayer-times-api-key
+				    )
   "url")
 
-(defcustom prayer-times-prayer-time-xml "~/.prayer-times"
+(defcustom prayer-times-prayer-time-json "~/.prayer-times"
   "Location of prayer times cache")
 
 ;;;###autoload
@@ -131,13 +119,13 @@
   "Download the prayer times to the cache"
   (interactive)
   (shell-command
-   (format (concat "wget -O " prayer-times-prayer-time-xml " '%s'") prayer-times-url)))
+   (format (concat "wget -O " prayer-times-prayer-time-json " '%s'") prayer-times-url)))
 
 (defun read-prayer-times (file)
-"Reads the prayer times xml into memory"
+"Reads the prayer times json into memory"
   (with-temp-buffer
     (insert-file-contents file)
-    (libxml-parse-xml-region (point-min) (point-max))))
+    (json-parse-buffer)))
 
 (defmacro format-prayer-times (prayer-time)
   "format the prayer times so that they displayed as the name of the prayer on the left
@@ -147,14 +135,35 @@ and the time of the prayer on the right."
 (defun format-prayer-times (prayer-time)
   (insert (pp-to-string (first prayer-time)) " " (pp-to-string (last prayer-time))))
 
-(defmacro get-prayer-time (prayer prayer-time-xml)
-  `(assoc ,prayer prayer-time-xml))
+(defun get-prayer-time (prayer prayer-time-json)
+  (gethash prayer prayer-time-json))
+
+
+
+
+(defun get-prayer-time (prayer times-ht)
+  "Get a prayer time string from the times hash table.
+PRAYER is a string like \"Fajr\", \"Dhuhr\", etc."
+  (gethash prayer times-ht))
+
+(defun parse-prayer-times (json-string)
+  "Parse the full API response and return the times hash table."
+  (let* ((root  (read-prayer-times prayer-times-prayer-time-json))
+         (data  (gethash "data" root))
+         (times (gethash "times" data)))
+    times))
+
+
+
 
 (defun display-prayer-times ()
-  (let ((prayer-time-xml (read-prayer-times prayer-times-prayer-time-xml)))
-    (dolist (prayer '(date fajr sunrise dhuhr asr maghrib isha))
-      (format-prayer-times
-       (get-prayer-time prayer prayer-time-xml)))))
+
+(let* ((times (parse-prayer-times prayer-times-prayer-time-json)))
+  (insert "Fajr:    %s" (get-prayer-time "Fajr"    times))
+  (insert "Dhuhr:   %s" (get-prayer-time "Dhuhr"   times))
+  (insert "Asr:     %s" (get-prayer-time "Asr"     times))
+  (insert "Maghrib: %s" (get-prayer-time "Maghrib" times))
+  (insert "Isha:    %s" (get-prayer-time "Isha"    times))))
 
 ;;;###autoload
 (defun prayer-times ()
