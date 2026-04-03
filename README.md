@@ -71,3 +71,7 @@ Islamic prayer times in Emacs
  asr ("4:47")
  maghrib ("7:25")
  isha ("8:41")</pre>
+
+https://islamicapi.com/doc/prayer-time/
+
+Completed as part of Lisp In Summer Projects 2013 contest [https://lispnyc.github.io/lispinsummerprojects/completed-projects.html](completed projects)

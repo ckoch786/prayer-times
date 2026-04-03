@@ -87,11 +87,11 @@
 
 ;; 16 degree ISNA, 1 is 18 degree time University of Islamic Science, Karachi
 (defcustom prayer-times-method "2" 
-  "Method of calculation")
+  "Method of calculation 2 - Islamic Society of North America 15 degree Fajr and Isha. 1 - University of Islamic Sciences, Karachi 18 degree time for Fajr and Isha")
 
 ;; Shafi, 2 is Hanafi
 (defcustom prayer-times-school "1" 
-  "School (madhab)")
+  "School (madhab) 1 Shafi(Asr is shadows length) 2 Hanafi (Asr is double shadows length)")
 
 (defcustom prayer-times-latitude "40.0168996"
   "latitude")
@@ -99,7 +99,7 @@
 (defcustom prayer-times-longitude "-83.1480781"
   "longitude")
 
-(defcustom prayer-times-api-key "9i165kupa4LdtFOTnCtBe9v76JzEN86lDhG0HOkQG7E3ak50"
+(defcustom prayer-times-api-key "placeholder"
   "API key")
 
 (defcustom prayer-times-url (concat "https://islamicapi.com/api/v1/prayer-time/?"
@@ -127,19 +127,36 @@
     (insert-file-contents file)
     (json-parse-buffer)))
 
-(defmacro format-prayer-times (prayer-time)
-  "format the prayer times so that they displayed as the name of the prayer on the left
-and the time of the prayer on the right."
-  `(insert "\n" (pp-to-string (first ,prayer-time)) " " (pp-to-string (last ,prayer-time))))
+(defun to-12-hours (time)
+  "Converts 24 hour time into 12 hour time."
+  (let* ((parts (split-string time ":"))
+         (hour (string-to-number (car parts)))
+         (minute (string-to-number (cadr parts)))
+         (period "AM")
+         (minute-str "")
+         (hour-str ""))
 
-(defun format-prayer-times (prayer-time)
-  (insert (pp-to-string (first prayer-time)) " " (pp-to-string (last prayer-time))))
+    ;; Determine AM/PM and adjust hour
+    (cond
+     ((<= hour 11)
+      (setq period "AM"))
+     ((= hour 12)
+      (setq period "PM"))
+     ((> hour 12)
+      (setq hour (- hour 12))
+      (setq period "PM")))
 
-(defun get-prayer-time (prayer prayer-time-json)
-  (gethash prayer prayer-time-json))
+    ;; Format minute with padding
+    (setq minute-str (if (< minute 10)
+                         (format "0%d" minute)
+                       (format "%d" minute)))
 
+    ;; Format hour with padding
+    (setq hour-str (if (< hour 10)
+                       (format "0%d" hour)
+                     (format "%d" hour)))
 
-
+    (format "%s:%s %s" hour-str minute-str period)))
 
 (defun get-prayer-time (prayer times-ht)
   "Get a prayer time string from the times hash table.
@@ -153,17 +170,42 @@ PRAYER is a string like \"Fajr\", \"Dhuhr\", etc."
          (times (gethash "times" data)))
     times))
 
+(defun parse-day (json-string)
+  "Parse the full API response and return the times hash table."
+  (let* ((root  (read-prayer-times json-string))
+         (data  (gethash "data" root))
+         (date  (gethash "date" data))
+         (hijri (gethash "hijri" date))
+	 (day (gethash "day" hijri)))
+    day))
 
+(defun parse-year (json-string)
+  "Parse the full API response and return the times hash table."
+  (let* ((root  (read-prayer-times json-string))
+         (data  (gethash "data" root))
+         (date  (gethash "date" data))
+         (hijri (gethash "hijri" date))
+	 (day (gethash "year" hijri)))
+    day))
 
+(defun parse-month (json-string)
+  "Parse the full API response and return the times hash table."
+  (let* ((root  (read-prayer-times json-string))
+         (data  (gethash "data" root))
+         (date  (gethash "date" data))
+         (hijri (gethash "hijri" date))
+	 (month (gethash "month" hijri))
+	 (en (gethash "en" month)))
+    en))
 
 (defun display-prayer-times ()
-
-(let* ((times (parse-prayer-times prayer-times-prayer-time-json)))
-  (insert "Fajr:    %s" (get-prayer-time "Fajr"    times))
-  (insert "Dhuhr:   %s" (get-prayer-time "Dhuhr"   times))
-  (insert "Asr:     %s" (get-prayer-time "Asr"     times))
-  (insert "Maghrib: %s" (get-prayer-time "Maghrib" times))
-  (insert "Isha:    %s" (get-prayer-time "Isha"    times))))
+  (let* ((times (parse-prayer-times prayer-times-prayer-time-json)))
+    (insert (format "%s %s %s\n" (parse-month prayer-times-prayer-time-json)
+		    (parse-day prayer-times-prayer-time-json)
+		    (parse-year prayer-times-prayer-time-json)))
+    (dolist (prayer '("Fajr" "Sunrise" "Dhuhr" "Asr" "Maghrib" "Isha"))
+	(insert  (format "%-10s %s\n" prayer (to-12-hours (get-prayer-time prayer times))))
+	)))
 
 ;;;###autoload
 (defun prayer-times ()
