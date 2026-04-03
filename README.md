@@ -3,6 +3,8 @@ prayer-times
 
 Islamic prayer times in Emacs
 
+<img width="994" height="984" alt="image" src="https://github.com/user-attachments/assets/b754c424-94c4-454b-8019-c10074eea1f8" />
+
 * Commentary:
  Prayer times currently will get the prayer times for your location
  for the current date. The goal is to make it behave similar to calendar
