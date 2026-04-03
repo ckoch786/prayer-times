@@ -34,4 +34,4 @@ Islamic prayer times in Emacs
 
 
 
-Completed as part of Lisp In Summer Projects 2013 contest (https://lispnyc.github.io/lispinsummerprojects/completed-projects.html)[completed projects]
+Completed as part of [Lisp In Summer Projects 2013 contest](https://lispnyc.github.io/lispinsummerprojects/completed-projects.html)
